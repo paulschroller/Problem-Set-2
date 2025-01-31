@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
 
-#used chatgpt to help with coding
 
 #a, b, c will be x, y, z for cartesian, r, theta, z for cylindrical, r, theta, phi for spherical where theta is the azimuthal angle
 #frombasis and tobasis will be written as cart, sph, or cyl
@@ -112,6 +111,7 @@ ax.legend(by_label.values(), by_label.keys())
 
 plt.show()
 '''
+
 '''
 #Part e)
 alphavar = 0.2
