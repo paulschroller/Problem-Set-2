@@ -5,9 +5,10 @@ import math
 from scipy.spatial import Delaunay
 
 
-#Part a)
 data = np.loadtxt("/root/Desktop/host/ProblemSet2/mesh.dat", skiprows=1)
-#plt.plot(data[:,0], data[:,1], linewidth=0,marker='o',color='blue', label='data')
+'''
+#convex hull
+plt.plot(data[:,0], data[:,1], linewidth=0,marker='o',color='blue', label='data')
 
 
 
@@ -49,60 +50,78 @@ def xandy(array, offset):
 
 hullx, hully = xandy(jarvismarch(data),0)
 
-#plt.plot(hullx, hully,color='red')
-tri = Delaunay(data)
-trisimplices = tri.simplices
-#plt.triplot(data[:,0], data[:,1], trisimplices)
-#plt.xlabel("X")
-#plt.ylabel("Y")
-#plt.show
+plt.plot(hullx, hully,color='red')
+plt.show()
+'''
 
-#part b)
+points_2d = data[:, :2]
 
-liftedpoints = []
-for i in range(len(data)):
-    nextpoint = [data[i][0], data[i][1], (data[i][0]**2+data[i][1]**2)]
-    liftedpoints.append(nextpoint)
+# Lift to 3D using z = x^2 + y^2
+x, y = points_2d[:, 0], points_2d[:, 1]
+z = x**2 + y**2
+points_3d = np.column_stack((x, y, z))  # Create (x, y, z) points
 
-def trianglearea(point1, point2, point3):
-    vector1 = [point2[0]-point1[0], point2[1]-point1[1], point2[2]-point1[2]]
-    vector2 = [point3[0]-point1[0], point3[1]-point1[1], point3[2]-point1[2]]
-    mag1 = ((vector1[0]**2)+(vector1[1]**2)+(vector1[2]**2))**0.5
-    mag2 = ((vector2[0]**2)+(vector2[1]**2)+(vector2[2]**2))**0.5
-    dotproduct = vector1[0]*vector2[0]+vector1[1]*vector2[1]+vector1[2]*vector2[2]
-    costheta = dotproduct/(mag1*mag2)
-    sintheta = (1-costheta**2)**0.5
-    return 0.5*mag1*mag2*sintheta
+#delaunay triangulation
+tri = Delaunay(points_2d)
 
+#part c)
+def inducedmetric(x,y):
+    return [[1 + 4*x**2, 4*x*y],[4*x*y, 1+4*y**2]]
 
-triangleareas = []
-for i in range(len(trisimplices)):
-    point1 = [data[trisimplices[i][0]][0], data[trisimplices[i][0]][1], 0]
-    point2 = [data[trisimplices[i][1]][0], data[trisimplices[i][1]][1], 0]
-    point3 = [data[trisimplices[i][2]][0], data[trisimplices[i][2]][1], 0]
-    triangleareas.append(trianglearea(point1, point2, point3))
+#part d)
+def compute_face_normals(tri, points_3d):
+    normals = []
+    for simplex in tri.simplices:
+        p1, p2, p3 = points_3d[simplex]
+        v1, v2 = p2 - p1, p3 - p1
+        normal = np.cross(v1, v2)
+        normal /= np.linalg.norm(normal)  # Normalize the normal
+        normals.append(normal)
+    return np.array(normals)
 
+face_normals = compute_face_normals(tri, points_3d)
 
-liftedareas = []
-for i in range(len(trisimplices)):
-    point1 = liftedpoints[trisimplices[i][0]]
-    point2 = liftedpoints[trisimplices[i][1]]
-    point3 = liftedpoints[trisimplices[i][2]]
-    liftedareas.append(trianglearea(point1, point2, point3))
+#part e)
+def compute_vertex_normals(tri, face_normals, num_points):
+    vertex_normals = np.zeros((num_points, 3))
+    count = np.zeros(num_points)
 
-trianglecenters = []
-for i in range(len(trisimplices)):
-    point1 = data[trisimplices[i][0]]
-    point2 = data[trisimplices[i][1]]
-    point3 = data[trisimplices[i][2]]
-    centerpoint = [(point1[0]+point2[0]+point3[0])/3, (point1[1]+point2[1]+point3[1])/3]
-    trianglecenters.append(centerpoint)
+    for i, simplex in enumerate(tri.simplices):
+        for vertex in simplex:
+            vertex_normals[vertex] += face_normals[i]
+            count[vertex] += 1
 
-arearatio = []
-for i in range(len(triangleareas)):
-    arearatio.append(liftedareas[i]/triangleareas[i])
+    vertex_normals /= count[:, None]  # Normalize by count
+    vertex_normals /= np.linalg.norm(vertex_normals, axis=1, keepdims=True)  # Normalize vectors
+    return vertex_normals
 
-print(arearatio)
+vertex_normals = compute_vertex_normals(tri, face_normals, len(points_3d))
 
-centersx, centersy = xandy(trianglecenters,0)
-plt.scatter(centersx, centersy, c=arearatio, cmap='viridis', edgecolor='k', vmin = 0, vmax = 40)
+# Plot face normals on the lifted mesh
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_trisurf(points_3d[:, 0], points_3d[:, 1], points_3d[:, 2], triangles=tri.simplices, alpha=0.5, edgecolor='gray')
+
+# Plot surface normals
+for simplex, normal in zip(tri.simplices, face_normals):
+    center = np.mean(points_3d[simplex], axis=0)  # Compute triangle center
+    ax.quiver(center[0], center[1], center[2], normal[0], normal[1], normal[2], color='red', length=0.2, normalize=True)
+
+ax.set_title("Surface Normals")
+plt.show()
+
+# Plot vertex normals
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_trisurf(points_3d[:, 0], points_3d[:, 1], points_3d[:, 2], triangles=tri.simplices, alpha=0.5, edgecolor='gray')
+
+# Plot vertex normals
+for i in range(len(points_3d)):
+    ax.quiver(points_3d[i, 0], points_3d[i, 1], points_3d[i, 2], vertex_normals[i, 0], vertex_normals[i, 1], vertex_normals[i, 2], color='blue', length=0.2, normalize=True)
+
+ax.set_title("Vertex Normals")
+plt.show()
+
+#part f)
+def secondfundamentalform(x,y):
+    return [[2/((4*x**2+4*y**2+1)**0.5), 0], [0, 2/((4*x**2+4*y**2+1)**0.5)]]
