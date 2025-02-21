@@ -5,8 +5,8 @@ import math
 from scipy.spatial import Delaunay
 
 
-data = np.loadtxt("/root/Desktop/host/ProblemSet2/mesh.dat", skiprows=1)
-'''
+data = np.loadtxt("./mesh.dat", skiprows=1)
+
 #convex hull
 plt.plot(data[:,0], data[:,1], linewidth=0,marker='o',color='blue', label='data')
 
@@ -51,8 +51,10 @@ def xandy(array, offset):
 hullx, hully = xandy(jarvismarch(data),0)
 
 plt.plot(hullx, hully,color='red')
+plt.savefig("./plots/problem3a.png")
 plt.show()
-'''
+plt.clf
+
 
 points_2d = data[:, :2]
 
@@ -108,7 +110,9 @@ for simplex, normal in zip(tri.simplices, face_normals):
     ax.quiver(center[0], center[1], center[2], normal[0], normal[1], normal[2], color='red', length=0.2, normalize=True)
 
 ax.set_title("Surface Normals")
+plt.savefig("./plots/problem3esurfacenormals")
 plt.show()
+plt.clf
 
 # Plot vertex normals
 fig = plt.figure(figsize=(8, 6))
@@ -120,7 +124,9 @@ for i in range(len(points_3d)):
     ax.quiver(points_3d[i, 0], points_3d[i, 1], points_3d[i, 2], vertex_normals[i, 0], vertex_normals[i, 1], vertex_normals[i, 2], color='blue', length=0.2, normalize=True)
 
 ax.set_title("Vertex Normals")
+plt.savefig("./plots/problem3evertexnormals")
 plt.show()
+plt.clf
 
 #part f)
 def secondfundamentalform(x,y):

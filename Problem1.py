@@ -36,7 +36,7 @@ def compute_basis_vectors(theta, phi):
     e_phi = np.array([-np.sin(phi), np.cos(phi), 0])
     return e_r, e_theta, e_phi
 
-'''
+
 theta_vals = np.linspace(0, np.pi, 10)
 phi_vals = np.linspace(0, 2*np.pi, 20)
 
@@ -58,12 +58,14 @@ for theta in theta_vals:
         ax.quiver(*point, *e_theta * scale, color='g', linewidth=2, label='e_theta' if (theta == theta_vals[0] and phi == phi_vals[0]) else "")
         ax.quiver(*point, *e_phi * scale, color='b', linewidth=2, label='e_phi' if (theta == theta_vals[0] and phi == phi_vals[0]) else "")
 
+plt.savefig("./plots/problem1b.png")
+plt.show()
+plt.clf
 
-'''
 #Part c) - You can't plot in spherical basis because pyplot works in cartesian, so you have to convert to cartesian first.
 
 
-'''
+
 #Part d)
 def f(x, y):
     return x**2 + y**2 #sample function
@@ -108,11 +110,11 @@ ax.set_title("Surface with Local Coordinate Frames")
 handles, labels = ax.get_legend_handles_labels()
 by_label = dict(zip(labels, handles))
 ax.legend(by_label.values(), by_label.keys())
-
+plt.savefig("./plots/problem1d.png")
 plt.show()
-'''
+plt.clf
 
-'''
+
 #Part e)
 alphavar = 0.2
 betavar = 0.1
@@ -143,9 +145,10 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 ax.set_title("Parallel Transport phi=0")
-
+plt.savefig("./plots/problem1e.png")
 plt.show()
-'''
+plt.clf
+
 
 #part f)
 alphavar = 0.2
@@ -178,5 +181,5 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 ax.set_title("Parallel Transport at theta_0 from phi=0 to phi=2pi")
-
+plt.savefig("./plots/problem1f.png")
 plt.show()

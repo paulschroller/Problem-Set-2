@@ -37,7 +37,7 @@ def stereographic_projection(x, y, z):
     """Perform stereographic projection from sphere to plane."""
     return x / (1 - z), y / (1 - z)
 
-'''
+
 # Generate sphere coordinates
 theta = np.linspace(0, 2*np.pi, 100)
 phi = np.linspace(0, np.pi, 50)
@@ -114,16 +114,18 @@ ax2.set_xlabel("x")
 ax2.set_ylabel("y")
 ax2.grid()
 
+plt.savefig("./plots/problem2a.png")
 plt.show()
+plt.clf
 
 # Print angle comparison
 print("Angle before projection:", np.degrees(angle_before))
 print("Angle after projection:", np.degrees(angle_after))
 print("Difference between angles before and after projection", np.degrees(angle_before) - np.degrees(angle_after))
-'''
+
 
 #part b)
-'''
+
 # Generate sphere coordinates
 theta = np.linspace(0, 2*np.pi, 100)
 phi = np.linspace(0, np.pi, 50)
@@ -166,11 +168,15 @@ ax2.legend()
 ax2.set_xlabel("x")
 ax2.set_ylabel("y")
 ax2.grid()
+
+plt.savefig("./plots/problem2b")
+plt.show()
+plt.clf
 #so great circles appear as circles after stereographic projection
-'''
+
 
 #part c)
-'''
+
 fig = plt.figure(figsize=(12, 6))
 ax = fig.add_subplot(121, projection='3d')
 ax2 = fig.add_subplot(122)
@@ -203,7 +209,8 @@ for i in range(len(basepoints)):
 
 # Plot original sphere with curves
 ax.plot_surface(X, Y, Z, color='c', alpha=0.3)
-'''
+plt.savefig("./plots/problem2c")
+
 
 #part d)
 
